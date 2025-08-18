@@ -1,6 +1,7 @@
 import os
-from dataclasses import dataclass
 import urllib.parse
+from dataclasses import dataclass
+
 
 @dataclass
 class Config:
@@ -16,4 +17,6 @@ class Config:
     DB_HOST: str = os.getenv("DB_HOST")
     DB_PORT: int = int(os.getenv("DB_PORT"))
     DB_SCHEMA: str = os.getenv("DB_SCHEMA")
-    SQLALCHEMY_URI: str = f"postgresql+psycopg2://{DB_USER}:{urllib.parse.quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    SQLALCHEMY_URI: str = (
+        f"postgresql+psycopg2://{DB_USER}:{urllib.parse.quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )

@@ -1,17 +1,22 @@
-from tasks import health_check as celery_health_check
-from kafka import BrokerConnection
-from app.logger import LOGGER
-from app.config import Config
-from app.database import init_db_session, SESSION
-from sqlalchemy import text
 from socket import AF_INET
+
+from app.config import Config
+from app.database import SESSION, init_db_session
+from app.logger import LOGGER
+from kafka import BrokerConnection
+from sqlalchemy import text
+from tasks import health_check_task as celery_health_check
+
 
 class HealthCheckService:
     def check_kafka_health(self) -> bool:
-      return self._check_celery_health() and self._check_kafka_health()
+        return self._check_celery_health() and self._check_kafka_health()
 
     def check_queue_health(self) -> bool:
-      return self._check_celery_health() and self._check_database_health()
+        return self._check_celery_health() and self._check_database_health()
+
+    def check_api_health(self) -> bool:
+        return self._check_database_health()
 
     def _check_celery_health(self) -> bool:
         try:
@@ -36,11 +41,11 @@ class HealthCheckService:
         except Exception as e:
             LOGGER.error(f"Kafka health check failed: {e}")
             return False
-    
+
     def _check_database_health(self) -> bool:
         try:
             init_db_session()
-            SESSION.execute(text('SELECT 1'))
+            SESSION.execute(text("SELECT 1"))
             return True
         except Exception as e:
             LOGGER.error(f"Database health check failed: {e}")

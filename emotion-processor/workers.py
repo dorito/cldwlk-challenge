@@ -1,21 +1,22 @@
 import argparse
-from services.kafka_worker import KafkaWorkerService
-from services.health_check import HealthCheckService
-from app.logger import init_logging, LOGGER
-from fastapi import FastAPI
+
+from app.logger import LOGGER, init_logging
+from services import KafkaWorkerService
 
 init_logging()
 
 parser = argparse.ArgumentParser(
-  prog='emotion-processor',
-  description='Does the emotion processing for ECS')
-parser.add_argument('--worker', choices=['kafka'], help='Which workers to initiate', required=True)
+    prog="emotion-processor", description="Does the emotion processing for ECS"
+)
+parser.add_argument(
+    "--worker", choices=["kafka"], help="Which workers to initiate", required=True
+)
 args = parser.parse_args()
 
 match args.worker:
-  case 'kafka':
-    LOGGER.info("Starting Kafka worker...")
-    worker = KafkaWorkerService()
-    worker.handle()
-  case _:
-    raise Exception(f"Unknown worker type: {args.worker}")
+    case "kafka":
+        LOGGER.info("Starting Kafka worker...")
+        worker = KafkaWorkerService()
+        worker.handle()
+    case _:
+        raise Exception(f"Unknown worker type: {args.worker}")
