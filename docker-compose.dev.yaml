@@ -57,6 +57,7 @@ services:
     extends:
       file: ./emotion-processor/docker-compose.dev.yaml
       service: kafka-worker
+    container_name: cldwlk-test-emotion-processor-kafka-worker
     depends_on:
       kafka:
         condition: service_healthy
@@ -68,6 +69,7 @@ services:
     extends:
       file: ./emotion-processor/docker-compose.dev.yaml
       service: queue-worker
+    container_name: cldwlk-test-emotion-processor-queue-worker
     depends_on:
       cache:
         condition: service_started
@@ -77,6 +79,7 @@ services:
     extends:
       file: ./emotion-processor/docker-compose.dev.yaml
       service: api
+    container_name: cldwlk-test-emotion-processor-api
     depends_on:
       database:
         condition: service_started
@@ -88,6 +91,7 @@ services:
     extends:
       file: ./credit-manager/docker-compose.dev.yaml
       service: api
+    container_name: cldwlk-test-credit-manager-api
     depends_on:
       database:
         condition: service_started
@@ -100,6 +104,7 @@ services:
     extends:
       file: ./credit-manager/docker-compose.dev.yaml
       service: kafka-worker
+    container_name: cldwlk-test-credit-manager-kafka-worker
     depends_on:
       kafka:
         condition: service_healthy
@@ -111,6 +116,21 @@ services:
     extends:
       file: ./credit-manager/docker-compose.dev.yaml
       service: queue-worker
+    container_name: cldwlk-test-credit-manager-queue-worker
     depends_on:
       cache:
         condition: service_started
+
+  public-gateway-api:
+    restart: always
+    extends:
+      file: ./public-gateway/docker-compose.dev.yaml
+      service: api
+    container_name: cldwlk-test-public-gateway-api
+    depends_on:
+      kafka:
+        condition: service_healthy
+      database:
+        condition: service_started
+    ports:
+      - "${PUBLIC_GATEWAY_API_PORT:-8883}:80"
