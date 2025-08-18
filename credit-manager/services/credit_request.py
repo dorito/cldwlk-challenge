@@ -4,11 +4,6 @@ import time
 import requests
 from sqlalchemy.orm import Session
 
-from app.circuit_breakers import (
-    celery_processing_breaker,
-    db_processing_breaker,
-    request_processing_breaker,
-)
 from app.logger import LOGGER
 from data.enums import CreditRequestStatusEnum
 from data.models import CreditRequestModel
@@ -19,7 +14,6 @@ class CreditRequestService:
     def __init__(self, DbSession: Session):
         self._session = DbSession
 
-    @db_processing_breaker
     def get_credit_request_history(
         self, profile_guid: str, limit: int
     ) -> list[CreditRequestModel]:
@@ -32,7 +26,6 @@ class CreditRequestService:
         )
         return credit_requests
 
-    @db_processing_breaker
     def get_by_guid(self, credit_request_guid: str) -> CreditRequestModel | None:
         LOGGER.info(f"Getting credit request by guid: {credit_request_guid}")
         return (
@@ -41,7 +34,6 @@ class CreditRequestService:
             .first()
         )
 
-    @db_processing_breaker
     def get_by_idempotency_guid(
         self, idempotency_guid: str
     ) -> CreditRequestModel | None:
@@ -51,7 +43,6 @@ class CreditRequestService:
             .first()
         )
 
-    @db_processing_breaker
     def create_credit_request(
         self, request: CreditRequestCreationSchema
     ) -> CreditRequestModel:
@@ -81,19 +72,16 @@ class CreditRequestService:
             self._session.rollback()
             raise e
 
-    @celery_processing_breaker
     def _credit_request_created_event(self, credit_request_guid: str):
         from tasks import process_credit_request_task
 
         process_credit_request_task.apply_async([credit_request_guid])
 
-    @celery_processing_breaker
     def _credit_request_updated_event(self, credit_request_guid: str):
         from tasks import notify_credit_request_task
 
         notify_credit_request_task.apply_async([credit_request_guid])
 
-    @db_processing_breaker
     def update_to_approved_values(
         self, credit_request_guid: str, approved_values: dict
     ):
@@ -105,9 +93,9 @@ class CreditRequestService:
                 )
                 return
             credit_request.status = approved_values["status"].value
-            credit_request.interest_rate = approved_values["interest_rate"]
-            credit_request.available_amount = approved_values["available_amount"]
-            credit_request.available_credit_type = approved_values["credit_type"].value
+            credit_request.interest_rate = approved_values["interest_rate"] if credit_request.status == CreditRequestStatusEnum.APPROVED.value else None
+            credit_request.available_amount = approved_values["available_amount"] if credit_request.status == CreditRequestStatusEnum.APPROVED.value else None
+            credit_request.available_credit_type = approved_values["credit_type"].value if credit_request.status == CreditRequestStatusEnum.APPROVED.value else None
             self._session.commit()
             self._credit_request_updated_event(credit_request.guid)
         except Exception as e:
@@ -115,7 +103,6 @@ class CreditRequestService:
             self._session.rollback()
             raise e
 
-    @request_processing_breaker
     def notify_webhook(self, credit_request: CreditRequestModel):
         self._session.refresh(credit_request)
         webhook_url = credit_request.webhook_url

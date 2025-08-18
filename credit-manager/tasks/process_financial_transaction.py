@@ -1,5 +1,4 @@
 from app.celery import app as celery_app
-from app.circuit_breakers import db_processing_breaker
 from app.database import DbSession
 from app.logger import LOGGER
 from data.models import FinancialTransactionModel
@@ -12,7 +11,6 @@ def process_financial_transaction_task(msg):
     _save_financial_transaction_into_db(parsed_msg)
 
 
-@db_processing_breaker
 def _save_financial_transaction_into_db(msg):
     transaction = (
         DbSession.query(FinancialTransactionModel)
@@ -29,7 +27,7 @@ def _save_financial_transaction_into_db(msg):
     transaction = FinancialTransactionModel(
         idempotency_guid=msg.idempotency_guid,
         profile_guid=msg.profile_guid,
-        received_at=msg.datetime,
+        received_at=msg.received_at,
         source=msg.source,
         reason=msg.reason,
         amount=msg.amount,

@@ -1,7 +1,7 @@
 import enum
 
 
-class CreditRequestTypeEnum(enum.Enum):
+class CreditRequestTypeEnum(enum.StrEnum):
     SHORT = "short"
     MID = "mid"
     LONG = "long"

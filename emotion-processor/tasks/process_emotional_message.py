@@ -1,5 +1,4 @@
 from app.celery import app as celery_app
-from app.circuit_breakers import db_processing_breaker
 from app.database import DbSession
 from app.logger import LOGGER
 from data.models import EmotionModel, EmotionTraceModel
@@ -13,25 +12,24 @@ def process_emotional_message_task(msg):
     _save_emotional_message_into_db(parsed_msg)
 
 
-@db_processing_breaker
 def _save_emotional_message_into_db(msg):
     trace = (
         DbSession.query(EmotionTraceModel)
-        .filter_by(idempotency_id=msg.idempotency_id)
+        .filter_by(idempotency_guid=msg.idempotency_guid)
         .first()
     )
 
     if trace is not None and trace.processed is True:
         LOGGER.info(
-            "Trace with idempotency id {msg.idempotency_id} is already processed, skipping"
+            "Trace with idempotency guid {msg.idempotency_guid} is already processed, skipping"
         )
         return
 
     if trace is None:
         trace = EmotionTraceModel(
-            idempotency_id=msg.idempotency_id,
+            idempotency_guid=msg.idempotency_guid,
             profile_guid=msg.profile_guid,
-            received_at=msg.datetime,
+            received_at=msg.received_at,
         )
         DbSession.add(trace)
         DbSession.commit()
@@ -50,4 +48,4 @@ def _save_emotional_message_into_db(msg):
     DbSession.commit()
     trace.processed = True
     DbSession.commit()
-    LOGGER.info("Trace with idempotency id {msg.idempotency_id} succesfully processed")
+    LOGGER.info("Trace with idempotency id {msg.idempotency_guid} succesfully processed")

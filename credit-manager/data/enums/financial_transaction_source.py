@@ -1,6 +1,6 @@
 import enum
 
 
-class FinancialTransactionSourceEnum(enum.Enum):
+class FinancialTransactionSourceEnum(enum.StrEnum):
     INTERNAL = "internal"
     EXTERNAL = "external"

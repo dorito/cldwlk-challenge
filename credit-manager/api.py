@@ -29,7 +29,7 @@ def get_db_session():
 DbSessionDep = Annotated[Session, Depends(get_db_session)]
 
 
-@app.get("/internal/financial-transaction/by-profile-guid/{profile_guid}")
+@app.get("/internal/financial-transaction-data/by-profile-guid/{profile_guid}")
 def get_financial_transaction_data(
     profile_guid: uuid.UUID,
     response: Response,
