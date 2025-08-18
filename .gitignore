@@ -1,3 +1,4 @@
 *.pyc
 technical-case.md
 *.env
+.local_volumes

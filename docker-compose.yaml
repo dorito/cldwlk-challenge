@@ -1,8 +1,7 @@
-version: "3"
 services:
+  # Local infra services (kafka, zookeeper, kafka-ui, postgresql, redis)
   kafka:
     image: bitnami/kafka:4.0.0-debian-12-r10
-    container_name: kafka
     restart: on-failure
     environment:
       - KAFKA_CFG_NODE_ID=0
@@ -13,7 +12,13 @@ services:
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_AUTO_CREATE_TOPICS=true
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_started
+    healthcheck:
+      test: kafka-topics.sh --list --bootstrap-server localhost:9092 || exit 1 # without this the kafka workers won't start correctly
+      interval: 1s
+      timeout: 60s
+      retries: 60
 
   zookeeper:
     image: bitnami/zookeeper:3.9.3-debian-12-r21
@@ -23,10 +28,11 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:v0.7.2
-    container_name: kafka-ui
     depends_on:
-      - kafka
-      - zookeeper
+      kafka:
+        condition: service_healthy
+      zookeeper:
+        condition: service_started
     ports:
       - "${KAFKA_UI_PORT:-8080}:8080"
     restart: always
@@ -35,15 +41,33 @@ services:
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
 
-  postgres:
+  database:
     image: postgres:13.22-alpine3.22
-    container_name: postgres
     restart: always
     shm_size: 128mb
     environment:
       POSTGRES_PASSWORD: "postgres"
 
-  redis:
+  cache:
     image: redis:8.2.0
-    container_name: redis
     restart: always
+
+  emotion-processor-kafka-worker:
+    restart: always
+    extends:
+      file: ./emotion-processor/docker-compose.yaml
+      service: kafka-worker
+    depends_on:
+      kafka:
+        condition: service_healthy
+      cache:
+        condition: service_started
+
+  emotion-processor-queue-worker:
+    restart: always
+    extends:
+      file: ./emotion-processor/docker-compose.yaml
+      service: queue-worker
+    depends_on:
+      cache:
+        condition: service_started
