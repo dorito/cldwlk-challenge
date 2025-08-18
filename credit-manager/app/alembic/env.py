@@ -1,10 +1,11 @@
 from logging.config import fileConfig
 
 from alembic import context
+from sqlalchemy import engine_from_config, pool
+
 from app.config import Config
 from data.models import *
 from data.models.base import BaseModel
-from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,6 +21,8 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = BaseModel.metadata
+config.set_main_option("script_location", "myapp:migrations")
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -46,11 +49,13 @@ def run_migrations_offline() -> None:
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
+        version_table_schema=Config.DB_SCHEMA,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
         include_schemas=True,
+        include_name=include_name,
     )
 
     with context.begin_transaction():
@@ -73,6 +78,7 @@ def run_migrations_online() -> None:
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
+            version_table_schema=Config.DB_SCHEMA,
             target_metadata=target_metadata,
             include_schemas=True,
             include_name=include_name,

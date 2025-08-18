@@ -55,7 +55,7 @@ services:
   emotion-processor-kafka-worker:
     restart: always
     extends:
-      file: ./emotion-processor/docker-compose.yaml
+      file: ./emotion-processor/docker-compose.dev.yaml
       service: kafka-worker
     depends_on:
       kafka:
@@ -66,7 +66,7 @@ services:
   emotion-processor-queue-worker:
     restart: always
     extends:
-      file: ./emotion-processor/docker-compose.yaml
+      file: ./emotion-processor/docker-compose.dev.yaml
       service: queue-worker
     depends_on:
       cache:
@@ -75,10 +75,42 @@ services:
   emotion-processor-api:
     restart: always
     extends:
-      file: ./emotion-processor/docker-compose.yaml
+      file: ./emotion-processor/docker-compose.dev.yaml
       service: api
     depends_on:
       database:
         condition: service_started
     ports:
       - "${EMOTION_PROCESSOR_API_PORT:-8881}:80"
+
+  credit-manager-api:
+    restart: always
+    extends:
+      file: ./credit-manager/docker-compose.dev.yaml
+      service: api
+    depends_on:
+      database:
+        condition: service_started
+    ports:
+      - "${CREDIT_MANAGER_API_PORT:-8882}:80"
+
+
+  credit-manager-kafka-worker:
+    restart: always
+    extends:
+      file: ./credit-manager/docker-compose.dev.yaml
+      service: kafka-worker
+    depends_on:
+      kafka:
+        condition: service_healthy
+      cache:
+        condition: service_started
+
+  credit-manager-queue-worker:
+    restart: always
+    extends:
+      file: ./credit-manager/docker-compose.dev.yaml
+      service: queue-worker
+    depends_on:
+      cache:
+        condition: service_started

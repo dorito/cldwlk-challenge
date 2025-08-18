@@ -12,13 +12,14 @@ services:
       - --port 
       - "80"
     env_file:
+      - .env.dev
       - .env
     volumes:
       - .:/code
     healthcheck:
       test: python health_check.py --service api|| exit 1
-      interval: 5s
-      timeout: 5s
+      interval: 60s
+      timeout: 30s
       retries: 5
   kafka-worker:
     build:
@@ -30,13 +31,14 @@ services:
       - --worker
       - kafka
     env_file:
+      - .env.dev
       - .env
     volumes:
       - .:/code
     healthcheck:
       test: python health_check.py --service kafka|| exit 1
-      interval: 5s
-      timeout: 5s
+      interval: 60s
+      timeout: 30s
       retries: 5
   queue-worker:
     build:
@@ -53,11 +55,12 @@ services:
       - -c
       - "1000"
     env_file:
+      - .env.dev
       - .env
     volumes:
       - .:/code
     healthcheck:
       test: python health_check.py --service queue || exit 1
-      interval: 5s
-      timeout: 5s
+      interval: 60s
+      timeout: 30s
       retries: 5
