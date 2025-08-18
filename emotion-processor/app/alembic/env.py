@@ -1,12 +1,11 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 from app.config import Config
-from models.base_model import BaseModel
-from models import *
-from alembic import context
+from data.models import *
+from data.models.base import BaseModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -74,7 +73,7 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, 
+            connection=connection,
             target_metadata=target_metadata,
             include_schemas=True,
             include_name=include_name,
@@ -83,12 +82,14 @@ def run_migrations_online() -> None:
         with context.begin_transaction():
             context.run_migrations()
 
+
 def include_name(name, type_, parent_names):
     if type_ == "schema":
-        return name in ['emotion_processor']
+        return name in ["emotion_processor"]
     else:
         return True
-    
+
+
 if context.is_offline_mode():
     run_migrations_offline()
 else:
