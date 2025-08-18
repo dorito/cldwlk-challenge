@@ -1,0 +1,43 @@
+version: "3"
+services:
+  kafka-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      - python
+      - workers.py
+      - --worker
+      - kafka
+    env_file:
+      - .env
+    volumes:
+      - .:/code
+    healthcheck:
+      test: python health_check.py --service kafka|| exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  queue-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      - celery 
+      - -A 
+      - app.celery 
+      - worker 
+      - --loglevel=info
+      - -P
+      - eventlet
+      - -c
+      - "1000"
+    env_file:
+      - .env
+    volumes:
+      - .:/code
+    healthcheck:
+      test: python health_check.py --service queue || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
