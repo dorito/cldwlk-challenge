@@ -1,7 +1,7 @@
 import argparse
 
 from app.logger import LOGGER, init_logging
-from services.kafka_worker import KafkaWorkerService
+from services import KafkaWorkerService
 
 init_logging()
 

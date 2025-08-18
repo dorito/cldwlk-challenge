@@ -1,7 +1,7 @@
 import argparse
 
 from app.logger import LOGGER, init_logging
-from services.health_check import HealthCheckService
+from services import HealthCheckService
 
 init_logging()
 
@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument(
     "--service",
-    choices=["kafka", "queue"],
+    choices=["kafka", "queue", "api"],
     help="Which services can be health checked",
     required=True,
 )
@@ -23,6 +23,8 @@ match args.service:
         result = service.check_kafka_health()
     case "queue":
         result = service.check_queue_health()
+    case "api":
+        result = service.check_api_health()
     case _:
         raise Exception(f"Unknown worker type: {args.worker}")
 

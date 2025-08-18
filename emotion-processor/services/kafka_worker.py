@@ -1,8 +1,7 @@
-from kafka import KafkaConsumer
-
 from app.config import Config
 from app.logger import LOGGER
-from services.emotion import EmotionService
+from kafka import KafkaConsumer
+from services import EmotionService
 
 
 class KafkaWorkerService:

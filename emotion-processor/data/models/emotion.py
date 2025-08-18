@@ -1,9 +1,8 @@
 import uuid
 
+from data.models.base import BaseModel
 from sqlalchemy import ForeignKey, text, types
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from data.models.base import BaseModel
 
 
 class EmotionModel(BaseModel):
@@ -17,7 +16,7 @@ class EmotionModel(BaseModel):
     trace_guid: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("emotion_trace.guid"), nullable=False
     )
-    profile_id: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
+    profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
     name: Mapped[str] = mapped_column(types.String, nullable=False)
     percent: Mapped[float] = mapped_column(types.Float, nullable=False)
     trace: Mapped["EmotionTraceModel"] = relationship(back_populates="emotions")

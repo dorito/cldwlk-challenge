@@ -71,3 +71,14 @@ services:
     depends_on:
       cache:
         condition: service_started
+
+  emotion-processor-api:
+    restart: always
+    extends:
+      file: ./emotion-processor/docker-compose.yaml
+      service: api
+    depends_on:
+      database:
+        condition: service_started
+    ports:
+      - "${EMOTION_PROCESSOR_API_PORT:-8881}:80"

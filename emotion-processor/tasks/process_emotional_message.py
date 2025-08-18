@@ -30,7 +30,7 @@ def _save_emotional_message_into_db(msg):
     if trace is None:
         trace = EmotionTraceModel(
             idempotency_id=msg.idempotency_id,
-            profile_id=msg.profile_id,
+            profile_guid=msg.profile_guid,
             received_at=msg.datetime,
         )
         SESSION.add(trace)
@@ -42,7 +42,7 @@ def _save_emotional_message_into_db(msg):
     for emotion in msg.emotions:
         emotion_record = EmotionModel(
             trace_guid=trace.guid,
-            profile_id=msg.profile_id,
+            profile_guid=msg.profile_guid,
             name=emotion.name.value,
             percent=emotion.percent,
         )

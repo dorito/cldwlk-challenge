@@ -1,11 +1,10 @@
 from socket import AF_INET
 
-from kafka import BrokerConnection
-from sqlalchemy import text
-
 from app.config import Config
 from app.database import SESSION, init_db_session
 from app.logger import LOGGER
+from kafka import BrokerConnection
+from sqlalchemy import text
 from tasks import health_check_task as celery_health_check
 
 
@@ -15,6 +14,9 @@ class HealthCheckService:
 
     def check_queue_health(self) -> bool:
         return self._check_celery_health() and self._check_database_health()
+
+    def check_api_health(self) -> bool:
+        return self._check_database_health()
 
     def _check_celery_health(self) -> bool:
         try:

@@ -1,15 +1,28 @@
 import time
 
-from pybreaker import CircuitBreakerError
-from pydantic import ValidationError
-
 from app.circuit_breakers import celery_processing_breaker
 from app.logger import LOGGER
+from data.models import EmotionTraceModel
 from data.schemas import EmotionTraceSchema
+from pybreaker import CircuitBreakerError
+from pydantic import ValidationError
+from sqlalchemy.orm import Session
 from tasks import process_emotional_message_task
 
 
 class EmotionService:
+    def get_emotion_trace_data(
+        self, session: Session, profile_guid: str, limit: int
+    ) -> list[EmotionTraceModel]:
+        emotion_traces = (
+            session.query(EmotionTraceModel)
+            .filter_by(profile_guid=profile_guid)
+            .order_by(EmotionTraceModel.received_at.desc())
+            .limit(limit)
+            .all()
+        )
+        return emotion_traces
+
     def async_process_message(self, message):
         try:
             parsed_msg = EmotionTraceSchema.model_validate_json(message.value)

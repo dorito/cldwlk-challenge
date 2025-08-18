@@ -1,13 +1,12 @@
 import datetime
 import uuid
 
-from pydantic import BaseModel
-
 from data.schemas.emotion import EmotionSchema
+from pydantic import BaseModel
 
 
 class EmotionTraceSchema(BaseModel):
-    profile_id: uuid.UUID
+    profile_guid: uuid.UUID
     emotions: list[EmotionSchema]
     received_at: datetime.datetime
     idempotency_id: uuid.UUID
