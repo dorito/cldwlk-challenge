@@ -22,8 +22,8 @@ app = FastAPI()
 
 
 def get_db_session():
-    with Session(ENGINE) as session:
-        yield session
+    with Session(ENGINE) as DbSession:
+        yield DbSession
 
 
 DbSessionDep = Annotated[Session, Depends(get_db_session)]
@@ -38,7 +38,7 @@ def get_financial_transaction_data(
         Annotated[FinancialTransactionGetDataQueryParamsSchema, Query()], None
     ] = FinancialTransactionGetDataQueryParamsSchema.parse_obj({}),
 ) -> list[FinancialTransactionSchema]:
-    service = FinancialTransactionService(session=db_session)
+    service = FinancialTransactionService(DbSession=db_session)
     financial_transaction_data = service.get_financial_transaction_history(
         profile_guid=profile_guid, limit=query.limit
     )
@@ -57,7 +57,7 @@ def get_credit_request_data(
         Annotated[CreditRequestGetDataQueryParamsSchema, Query()], None
     ] = CreditRequestGetDataQueryParamsSchema.parse_obj({}),
 ) -> list[CreditResponseSchema]:
-    service = CreditRequestService(session=db_session)
+    service = CreditRequestService(DbSession=db_session)
     credit_request_data = service.get_credit_request_history(
         profile_guid=profile_guid, limit=query.limit
     )
@@ -73,7 +73,7 @@ def create_credit_request(
     db_session: DbSessionDep,
     status_code=status.HTTP_201_CREATED,
 ) -> CreditResponseSchema:
-    service = CreditRequestService(session=db_session)
+    service = CreditRequestService(DbSession=db_session)
     created_request = service.create_credit_request(request=credit_request)
     return created_request
 

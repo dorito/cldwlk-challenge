@@ -12,8 +12,8 @@ from data.schemas import FinancialTransactionSchema
 
 
 class FinancialTransactionService:
-    def __init__(self, session: Optional[Session] = None):
-        self._session = session
+    def __init__(self, DbSession: Optional[Session] = None):
+        self._session = DbSession
 
     def get_financial_transaction_history(
         self, profile_guid: str, limit: int

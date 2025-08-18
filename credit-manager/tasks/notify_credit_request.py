@@ -1,5 +1,5 @@
 from app.celery import app as celery_app
-from app.database import SESSION
+from app.database import DbSession
 from app.logger import LOGGER
 from data.enums import CreditRequestStatusEnum
 from services.credit_request import CreditRequestService
@@ -7,7 +7,7 @@ from services.credit_request import CreditRequestService
 
 @celery_app.task
 def notify_credit_request_task(credit_request_guid: str):
-    service = CreditRequestService(SESSION)
+    service = CreditRequestService(DbSession)
     credit_request = service.get_by_guid(credit_request_guid)
     if credit_request is None:
         LOGGER.error(f"Credit request with guid {credit_request_guid} not found")

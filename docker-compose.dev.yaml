@@ -55,7 +55,7 @@ services:
   emotion-processor-kafka-worker:
     restart: always
     extends:
-      file: ./emotion-processor/docker-compose.yaml
+      file: ./emotion-processor/docker-compose.dev.yaml
       service: kafka-worker
     depends_on:
       kafka:
@@ -66,7 +66,7 @@ services:
   emotion-processor-queue-worker:
     restart: always
     extends:
-      file: ./emotion-processor/docker-compose.yaml
+      file: ./emotion-processor/docker-compose.dev.yaml
       service: queue-worker
     depends_on:
       cache:
@@ -75,7 +75,7 @@ services:
   emotion-processor-api:
     restart: always
     extends:
-      file: ./emotion-processor/docker-compose.yaml
+      file: ./emotion-processor/docker-compose.dev.yaml
       service: api
     depends_on:
       database:

@@ -10,8 +10,8 @@ from data.models import FinancialTransactionModel
 
 
 class CreditAnalysisService:
-    def __init__(self, session: Session):
-        self._session = session
+    def __init__(self, DbSession: Session):
+        self._session = DbSession
 
     def get_credit_request_approved_values(
         self,

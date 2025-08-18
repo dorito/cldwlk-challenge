@@ -1,6 +1,6 @@
 from app.celery import app as celery_app
 from app.circuit_breakers import db_processing_breaker
-from app.database import SESSION
+from app.database import DbSession
 from app.logger import LOGGER
 from data.models import FinancialTransactionModel
 from data.schemas import FinancialTransactionCreationSchema
@@ -15,7 +15,7 @@ def process_financial_transaction_task(msg):
 @db_processing_breaker
 def _save_financial_transaction_into_db(msg):
     transaction = (
-        SESSION.query(FinancialTransactionModel)
+        DbSession.query(FinancialTransactionModel)
         .filter_by(idempotency_guid=msg.idempotency_guid)
         .first()
     )
@@ -37,8 +37,8 @@ def _save_financial_transaction_into_db(msg):
         paid_at=msg.paid_at,
         due_at=msg.due_at,
     )
-    SESSION.add(transaction)
-    SESSION.commit()
+    DbSession.add(transaction)
+    DbSession.commit()
     LOGGER.info(
         "Transaction with idempotency id {msg.idempotency_guid} succesfully processed"
     )
