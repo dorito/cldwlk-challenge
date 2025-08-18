@@ -7,7 +7,7 @@ from data.schemas import EmotionTraceSchema
 
 
 @celery_app.task
-def process_emotional_message(msg):
+def process_emotional_message_task(msg):
     LOGGER.info(msg)
     parsed_msg = EmotionTraceSchema.parse_obj(msg)
     _save_emotional_message_into_db(parsed_msg)

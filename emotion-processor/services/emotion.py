@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from app.circuit_breakers import celery_processing_breaker
 from app.logger import LOGGER
 from data.schemas import EmotionTraceSchema
-from tasks import process_emotional_message
+from tasks import process_emotional_message_task
 
 
 class EmotionService:
@@ -27,4 +27,4 @@ class EmotionService:
 
     @celery_processing_breaker
     def _async_process_message(self, message):
-        process_emotional_message.apply_async([message])
+        process_emotional_message_task.apply_async([message])
