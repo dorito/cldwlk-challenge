@@ -1,9 +1,6 @@
 import argparse
 
-from fastapi import FastAPI
-
 from app.logger import LOGGER, init_logging
-from services.health_check import HealthCheckService
 from services.kafka_worker import KafkaWorkerService
 
 init_logging()
