@@ -8,6 +8,7 @@ app = Celery("celery_app")
 app.conf.update(
     broker_url=Config.CELERY_BROKER,
     result_backend=Config.CELERY_BACKEND,
+    task_default_queue=Config.APP_NAME,
     include=["tasks"],
 )
 

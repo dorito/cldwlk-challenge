@@ -1,6 +1,6 @@
 from app.celery import app as celery_app
 from app.circuit_breakers import db_processing_breaker
-from app.database import SESSION
+from app.database import DbSession
 from app.logger import LOGGER
 from data.models import EmotionModel, EmotionTraceModel
 from data.schemas import EmotionTraceSchema
@@ -16,7 +16,7 @@ def process_emotional_message_task(msg):
 @db_processing_breaker
 def _save_emotional_message_into_db(msg):
     trace = (
-        SESSION.query(EmotionTraceModel)
+        DbSession.query(EmotionTraceModel)
         .filter_by(idempotency_id=msg.idempotency_id)
         .first()
     )
@@ -33,11 +33,11 @@ def _save_emotional_message_into_db(msg):
             profile_guid=msg.profile_guid,
             received_at=msg.datetime,
         )
-        SESSION.add(trace)
-        SESSION.commit()
+        DbSession.add(trace)
+        DbSession.commit()
     else:
-        SESSION.query(EmotionModel).filter_by(trace_guid=trace.guid).delete()
-        SESSION.commit()
+        DbSession.query(EmotionModel).filter_by(trace_guid=trace.guid).delete()
+        DbSession.commit()
 
     for emotion in msg.emotions:
         emotion_record = EmotionModel(
@@ -46,8 +46,8 @@ def _save_emotional_message_into_db(msg):
             name=emotion.name.value,
             percent=emotion.percent,
         )
-        SESSION.add(emotion_record)
-    SESSION.commit()
+        DbSession.add(emotion_record)
+    DbSession.commit()
     trace.processed = True
-    SESSION.commit()
+    DbSession.commit()
     LOGGER.info("Trace with idempotency id {msg.idempotency_id} succesfully processed")

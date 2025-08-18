@@ -79,12 +79,14 @@ def run_migrations_online() -> None:
         )
 
         with context.begin_transaction():
+            context.execute(f"create schema if not exists {Config.DB_SCHEMA};")
+            context.execute(f"set search_path to {Config.DB_SCHEMA}")
             context.run_migrations()
 
 
 def include_name(name, type_, parent_names):
     if type_ == "schema":
-        return name in ["emotion_processor"]
+        return name in [Config.DB_SCHEMA]
     else:
         return True
 

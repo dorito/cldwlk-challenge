@@ -1,7 +1,7 @@
 from socket import AF_INET
 
 from app.config import Config
-from app.database import SESSION, init_db_session
+from app.database import DbSession, init_db_session
 from app.logger import LOGGER
 from kafka import BrokerConnection
 from sqlalchemy import text
@@ -45,7 +45,7 @@ class HealthCheckService:
     def _check_database_health(self) -> bool:
         try:
             init_db_session()
-            SESSION.execute(text("SELECT 1"))
+            DbSession.execute(text("SELECT 1"))
             return True
         except Exception as e:
             LOGGER.error(f"Database health check failed: {e}")

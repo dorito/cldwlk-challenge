@@ -6,6 +6,7 @@ from dataclasses import dataclass
 @dataclass
 class Config:
     APP_ENV: str = os.getenv("APP_ENV", "development")
+    APP_NAME: str = os.getenv("APP_NAME")
     CELERY_BROKER: str = os.getenv("CELERY_BROKER")
     CELERY_BACKEND: str = os.getenv("CELERY_BACKEND")
     KAFKA_BOOTSTRAP_SERVERS: str = os.getenv("KAFKA_BOOTSTRAP_SERVERS")

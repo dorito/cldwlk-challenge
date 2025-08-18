@@ -16,8 +16,8 @@ from data.schemas import CreditRequestCreationSchema, CreditResponseSchema
 
 
 class CreditRequestService:
-    def __init__(self, session: Session):
-        self._session = session
+    def __init__(self, DbSession: Session):
+        self._session = DbSession
 
     @db_processing_breaker
     def get_credit_request_history(

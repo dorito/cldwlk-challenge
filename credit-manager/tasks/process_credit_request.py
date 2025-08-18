@@ -1,7 +1,7 @@
 import random
 
 from app.celery import app as celery_app
-from app.database import SESSION
+from app.database import DbSession
 from app.logger import LOGGER
 from data.enums import CreditRequestStatusEnum
 from data.models import CreditRequestModel
@@ -14,7 +14,7 @@ from services import (
 
 @celery_app.task
 def process_credit_request_task(credit_request_guid: str):
-    service = CreditRequestService(SESSION)
+    service = CreditRequestService(DbSession)
     credit_request = service.get_by_guid(credit_request_guid)
     if credit_request is None:
         LOGGER.error(f"Credit request with guid {credit_request_guid} not found")
@@ -31,13 +31,13 @@ def _get_emotional_score(profile_guid: str):
 
 
 def _get_transaction_history(profile_guid: str):
-    service = FinancialTransactionService(SESSION)
+    service = FinancialTransactionService(DbSession)
     transactions = service.get_financial_transaction_history(profile_guid, limit=10)
     return transactions
 
 
 def _get_approved_values(profile_guid: str, credit_request: CreditRequestModel):
-    service = CreditAnalysisService(SESSION)
+    service = CreditAnalysisService(DbSession)
     emotional_score = _get_emotional_score(profile_guid)
     transaction_history = _get_transaction_history(profile_guid)
     approved_values = service.get_credit_request_approved_values(
@@ -49,6 +49,6 @@ def _get_approved_values(profile_guid: str, credit_request: CreditRequestModel):
 
 
 def _update_credit_request(credit_request: CreditRequestModel):
-    service = CreditRequestService(SESSION)
+    service = CreditRequestService(DbSession)
     approved_values = _get_approved_values(credit_request.profile_guid, credit_request)
     service.update_to_approved_values(credit_request.guid, approved_values)

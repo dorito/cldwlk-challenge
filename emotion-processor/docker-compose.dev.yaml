@@ -12,6 +12,7 @@ services:
       - --port 
       - "80"
     env_file:
+      - .env.dev
       - .env
     volumes:
       - .:/code
@@ -30,6 +31,7 @@ services:
       - --worker
       - kafka
     env_file:
+      - .env.dev
       - .env
     volumes:
       - .:/code
@@ -53,6 +55,7 @@ services:
       - -c
       - "1000"
     env_file:
+      - .env.dev
       - .env
     volumes:
       - .:/code
