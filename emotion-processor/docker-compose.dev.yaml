@@ -13,7 +13,6 @@ services:
       - "80"
     env_file:
       - .env.dev
-      - .env
     volumes:
       - .:/code
     healthcheck:
@@ -32,7 +31,6 @@ services:
       - kafka
     env_file:
       - .env.dev
-      - .env
     volumes:
       - .:/code
     healthcheck:
@@ -56,7 +54,6 @@ services:
       - "1000"
     env_file:
       - .env.dev
-      - .env
     volumes:
       - .:/code
     healthcheck:

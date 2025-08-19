@@ -12,7 +12,7 @@ services:
       - --port 
       - "80"
     env_file:
-      - .env
+      - .env.dev
     volumes:
       - .:/code
     healthcheck:
