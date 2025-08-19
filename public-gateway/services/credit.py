@@ -9,7 +9,7 @@ from app.config import Config
 from app.logger import LOGGER
 from data.models import UserModel
 from data.schemas import CreditLoanCreationSchema, CreditLoanSchema
-from services import UserService
+from services.user import UserService
 
 
 class CreditLoanService:
@@ -59,5 +59,7 @@ class CreditLoanService:
             ]
             return credit_requests
         except Exception as e:
+            if e.response.status_code == 404:
+                return []
             LOGGER.error(f"Error listing credit loans: {e}")
             raise e

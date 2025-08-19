@@ -14,7 +14,8 @@ class FinancialTransactionModel(BaseModel):
     guid: Mapped[uuid.UUID] = mapped_column(
         types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
-    profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
+    idempotency_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False, index=True)
+    profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False, index=True)
     source: Mapped[str] = mapped_column(types.String(255), nullable=False)
     reason: Mapped[str] = mapped_column(types.String(255), nullable=False)
     amount: Mapped[decimal.Decimal] = mapped_column(
@@ -26,4 +27,3 @@ class FinancialTransactionModel(BaseModel):
     received_at: Mapped[datetime.datetime] = mapped_column(
         types.DateTime, nullable=False
     )
-    idempotency_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)

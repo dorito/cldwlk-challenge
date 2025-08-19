@@ -1,12 +1,9 @@
-import uuid
-from typing import Annotated, Union
+from typing import Annotated
 
-from fastapi import Depends, FastAPI, Request, Response, status
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI, Request, Response, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import ENGINE
-from app.exceptions import NotAuthorizedException
 from app.logger import LOGGER
 from data.models import UserModel
 from data.schemas import (
@@ -46,7 +43,7 @@ async def get_user_by_api_key(request: Request, db_session: DbSessionDep):
     LOGGER.info(f"API Key: {api_key}")
     user = service.get_user_by_api_key(api_key)
     if user is None:
-        raise NotAuthorizedException("Unauthorized")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
     return user
 
 
@@ -57,13 +54,16 @@ def create_user(
     try:
         service = UserService(db_session)
         created_user = service.create_user(email=user.email, password=user.password)
+        if created_user is None:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return {"error": "User already exists"}
         return created_user
     except Exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": "Internal server error"}
 
 
-@app.post("/internal/tests/fetch-api-key")
+@app.post("/internal/tests/get-user-data")
 def fetch_api_key(
     login_data: UserLoginSchema, response: Response, db_session: DbSessionDep
 ) -> UserSchema | ErrorSchema:
@@ -108,8 +108,6 @@ def create_emotion(
         new_emotion = service.create_emotion(emotion_data)
         response.status_code = status.HTTP_201_CREATED
         return new_emotion
-    except NotAuthorizedException:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
     except Exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": "Internal server error"}
@@ -125,8 +123,6 @@ def list_emotions(
         service = EmotionService(db_session, logged_user)
         emotions = service.list_emotions()
         return emotions
-    except NotAuthorizedException:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
     except Exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": "Internal server error"}
@@ -145,8 +141,6 @@ def create_financial_transaction(
         new_transaction = service.create_financial_transaction(transaction_data)
         response.status_code = status.HTTP_201_CREATED
         return new_transaction
-    except NotAuthorizedException:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
     except Exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": "Internal server error"}
@@ -162,8 +156,6 @@ def list_financial_transactions(
         service = FinancialTransactionService(db_session, logged_user)
         transactions = service.list_financial_transactions()
         return transactions
-    except NotAuthorizedException:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
     except Exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": "Internal server error"}
@@ -182,8 +174,6 @@ def create_credit_loan(
         new_loan = service.create_loan(loan_data)
         response.status_code = status.HTTP_201_CREATED
         return new_loan
-    except NotAuthorizedException:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
     except Exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": "Internal server error"}
@@ -200,8 +190,6 @@ def list_credit_loans(
         service = CreditLoanService(db_session, logged_user)
         loans = service.list_loans()
         return loans
-    except NotAuthorizedException:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
     except Exception:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"error": "Internal server error"}

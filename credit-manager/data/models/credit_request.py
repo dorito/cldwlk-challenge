@@ -15,8 +15,8 @@ class CreditRequestModel(BaseModel):
     guid: Mapped[uuid.UUID] = mapped_column(
         types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
-    idempotency_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
-    profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
+    idempotency_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False, index=True)
+    profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False, index=True)
     requested_amount: Mapped[decimal.Decimal] = mapped_column(
         types.DECIMAL(precision=14, scale=2), nullable=False
     )

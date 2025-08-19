@@ -15,7 +15,7 @@ class UserMetadataModel(BaseModel):
         server_default=text("gen_random_uuid()"),
     )
     user_guid: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.guid"), nullable=False
+        ForeignKey("user.guid"), nullable=False, index=True
     )
     key: Mapped[str] = mapped_column(types.String, nullable=False)
     value: Mapped[str] = mapped_column(types.String, nullable=False)

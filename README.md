@@ -2,32 +2,277 @@
 
 Here is my solution to the proposed coding challenge.
 
-## Project overview
-- Each application communicates with each other using Kafka, in an event driven architecture
-- Each application that have asynchronous processing does so using Celery
-- Each application that have public endpoints does so using FastAPI
-- For all applications, PostgreSQL is used for database and Redis is used for cache
+## Use cases and data flow
+![Use cases and data flow of the challenge](./docs/USER_CASES_AND_SYSTEM_FLOW.png "Use cases and data flow of the challenge")
+
+## Assumptions made
+- You have `docker` installed in your system
+- Port 8883 is available
 
 ## How to start the project in your machine
 You need to have `docker` installed and accessible by your terminal. With it, you can run the following command in the root folder to start the project:
-- `docker compose up -d`
+- `docker compose -f docker-compose.dev.yaml up -d`
 
-If you need to change any port of services that use them in the host machine, please populate the `.env` file, using `.env.example` as base for this.
+After the command runs successfuly, you need to execute three more commands:
+- `docker exec cldwlk-test-credit-manager-api alembic upgrade head`
+- `docker exec cldwlk-test-emotion-processor-api alembic upgrade head`
+- `docker exec cldwlk-test-public-gateway-api alembic upgrade head`
 
-## Base structure of each application
-- All applications have at least a kafka-worker and a queue-worker container
-- `credit-manager` and `user-manager` have an api container in addition of those two workers
-- The `kafka-worker` containers focuses on consuming kafka topics, and dispatching jobs to further processing
-  - For this, it uses the `kafka-python` library
-- The `queue-worker` containers does the async processing (and with this, does most of the database / external resource calls)
-  - For this, it uses the `celery` and `sqlalchemy` libraries
-- The api containers uses `FastAPI` for serving the endpoints
-- Every project has some (or all) of the following folders, each one containing the following type of files:
-  - `app` - core functions and configs
-  - `enums` - enums
-  - `models` - models used for database retrieval/saving
-  - `schemas` - schemas used for serializing/unserializing messages between services
-  - `services` - app logic
-  - `tasks` - asynchronous tasks
-  - `tests` - unit tests
-- The health check can be done by command, calling the `health_check.py` file and passing the `--service` that must be checked on (there are examples of this in the docker-compose.yaml files)
+## Available API REST endpoints
+- `/internal/tests/create-user [POST]`
+  - Description: creates user to validate the test locally
+  - Curl:
+```
+curl --request POST \
+  --url http://localhost:8883/internal/tests/create-user \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"email": "example@example.com",
+	"password": "abc123"
+}'
+```
+  - Example response:
+```
+{
+	"guid": "b50bd88a-84b9-4d42-9f71-116f4e2561d9",
+	"email": "example@example.com",
+	"api_key": "03d9d94b-371e-4d92-8bbe-8af7a10a6a6e",
+	"user_metadata": [
+		{
+			"guid": "be0af824-b197-4c2a-9882-e14e6809a6ee",
+			"user_guid": "b50bd88a-84b9-4d42-9f71-116f4e2561d9",
+			"key": "profile_guid",
+			"value": "38912240-5e22-444b-bf10-65118583ef38"
+		}
+	],
+	"registered_on": "2025-08-19T17:32:30.899669"
+}
+```
+- `/internal/tests/get-user-data [POST]`
+  - Description: get user data to be used at the authenticated requests
+  - Curl:
+```
+curl --request POST \
+  --url http://localhost:8883/internal/tests/get-user-data \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"email": "example@example.com",
+	"password": "abc123"
+}'
+```
+  - Example response:
+```
+{
+	"guid": "b50bd88a-84b9-4d42-9f71-116f4e2561d9",
+	"email": "example@example.com",
+	"api_key": "03d9d94b-371e-4d92-8bbe-8af7a10a6a6e",
+	"user_metadata": [
+		{
+			"guid": "be0af824-b197-4c2a-9882-e14e6809a6ee",
+			"user_guid": "b50bd88a-84b9-4d42-9f71-116f4e2561d9",
+			"key": "profile_guid",
+			"value": "38912240-5e22-444b-bf10-65118583ef38"
+		}
+	],
+	"registered_on": "2025-08-19T17:32:30.899669"
+}
+```
+- `/emotion/new [POST]`
+  - Description: create new emotion trace; request needs to be authenticated
+  - Curl:
+```
+curl --request POST \
+  --url http://localhost:8883/emotion/new \
+  --header 'Authorization: Bearer API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"emotions": [
+		{
+			"name": "angry",
+			"percent": 10
+		},
+		{
+			"name": "disgusted",
+			"percent": 80
+		},
+		{
+			"name": "surprised",
+			"percent": 10
+		}
+	]
+}'
+```
+  - Example response:
+```
+{
+	"emotions": [
+		{
+			"name": "angry",
+			"percent": 10.0
+		},
+		{
+			"name": "disgusted",
+			"percent": 80.0
+		},
+		{
+			"name": "surprised",
+			"percent": 10.0
+		}
+	],
+	"received_at": "2025-08-19T18:02:23.302570"
+}
+```
+
+- `/emotion/list [GET]`
+  - Description: get emotion traces; request needs to be authenticated
+  - Curl:
+```
+curl --request GET \
+  --url http://localhost:8883/emotion/list \
+  --header 'Authorization: Bearer API_KEY'
+```
+  - Example response:
+```
+[
+	{
+		"emotions": [
+			{
+				"name": "angry",
+				"percent": 10.0
+			},
+			{
+				"name": "disgusted",
+				"percent": 80.0
+			},
+			{
+				"name": "surprised",
+				"percent": 10.0
+			}
+		],
+		"received_at": "2025-08-19T18:04:24.589882"
+	}
+]
+```
+
+- `/financial-transaction/new [POST]`
+  - Description: create new financial transaction; request needs to be authenticated
+  - Curl:
+```
+curl --request POST \
+  --url http://localhost:8883/financial-transaction/new \
+  --header 'Authorization: Bearer API_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"source": "internal",
+	"reason": "other",
+	"is_paid": false,
+	"paid_at": null,
+	"due_at": "2025-12-31",
+	"amount": "123.45"
+}'
+```
+  - Example response:
+```
+{
+	"source": "internal",
+	"reason": "other",
+	"amount": "123.45",
+	"is_paid": false,
+	"paid_at": null,
+	"due_at": "2025-12-31T00:00:00"
+}
+```
+
+- `/financial-transaction/list [GET]`
+  - Description: get financial transaction data; request needs to be authenticated
+  - Curl:
+```
+curl --request GET \
+  --url http://localhost:8883/financial-transaction/list \
+  --header 'Authorization: Bearer API_KEY'
+```
+  - Example response:
+```
+[
+	{
+		"source": "internal",
+		"reason": "other",
+		"amount": "123.45",
+		"is_paid": false,
+		"paid_at": null,
+		"due_at": "2025-12-31T00:00:00"
+	}
+]
+```
+
+- `/credit-loan/new [POST]`
+  - Description: create new credit loan request; request needs to be authenticated
+  - Curl:
+```
+curl --request POST \
+  --url http://localhost:8883/credit-loan/new \
+  --header 'Authorization: Bearer API_KEY' \
+  --header 'Content-Type: application/json' \
+  --header 'User-Agent: insomnia/11.4.0' \
+  --data '{
+	"requested_amount": "123.45",
+	"requested_credit_type": "short",
+	"income": "1000",
+	"reason": "personal",
+	"webhook_url": "https://cldwlk-challenge-webhook-test.requestcatcher.com/"
+}'
+```
+  - Example response:
+```
+{
+	"guid": "e4a33be2-f1cc-408f-b238-a27e0efe5c26",
+	"profile_guid": "38912240-5e22-444b-bf10-65118583ef38",
+	"requested_amount": "123.45",
+	"income": "1000.00",
+	"requested_credit_type": "short",
+	"reason": "personal",
+	"status": "pending",
+	"available_amount": null,
+	"available_credit_type": null,
+	"interest_rate": null,
+	"webhook_url": "https://cldwlk-challenge-webhook-test.requestcatcher.com/"
+}
+```
+
+- `/credit-loan/list [GET]`
+  - Description: get credit loan requests data; request needs to be authenticated
+  - Curl:
+```
+curl --request GET \
+  --url http://localhost:8883/credit-loan/list \
+  --header 'Authorization: Bearer API_KEY'
+```
+
+  - Example response:
+```
+[
+	{
+		"guid": "e4a33be2-f1cc-408f-b238-a27e0efe5c26",
+		"profile_guid": "38912240-5e22-444b-bf10-65118583ef38",
+		"requested_amount": "123.45",
+		"income": "1000.00",
+		"requested_credit_type": "short",
+		"reason": "personal",
+		"status": "approved",
+		"available_amount": "123.45",
+		"available_credit_type": "short",
+		"interest_rate": "3.00",
+		"webhook_url": "https://cldwlk-challenge-webhook-test.requestcatcher.com/"
+	}
+]
+```
+
+## Planned upgrades for the future
+- Configuration to retry failed jobs in Celery
+- Automated tests in critical points
+
+## Other relevant docs
+- [SQL scripts](./docs/SQL.md)
+- [Emotion Processor overview](./docs/EMOTION_PROCESSOR.md)
+- [Credit Manager overview](./docs/CREDIT_MANAGER.md)
+- [Public Gateway overview](./docs/PUBLIC_GATEWAY.md)

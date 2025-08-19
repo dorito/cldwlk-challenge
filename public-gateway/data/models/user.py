@@ -15,7 +15,7 @@ class UserModel(BaseModel):
     )
     email: Mapped[str] = mapped_column(types.String, nullable=False, unique=True)
     hashed_password: Mapped[str] = mapped_column(types.String, nullable=False)
-    api_key: Mapped[str] = mapped_column(types.String, nullable=False)
+    api_key: Mapped[str] = mapped_column(types.String, nullable=False, index=True)
     user_metadata: Mapped[list["UserMetadataModel"]] = relationship(
         back_populates="user"
     )

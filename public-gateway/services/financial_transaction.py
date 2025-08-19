@@ -10,7 +10,7 @@ from app.config import Config
 from app.logger import LOGGER
 from data.models import UserModel
 from data.schemas import FinancialTransactionCreationSchema, FinancialTransactionSchema
-from services import UserService
+from services.user import UserService
 
 
 class FinancialTransactionService:
@@ -72,7 +72,6 @@ class FinancialTransactionService:
             ]
             return transactions
         except Exception as e:
-            LOGGER.error(e)
             if e.response.status_code == 404:
                 return []
             LOGGER.error(f"Error listing financial transactions: {e}")

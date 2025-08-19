@@ -15,7 +15,7 @@ class EmotionModel(BaseModel):
         server_default=text("gen_random_uuid()"),
     )
     trace_guid: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("emotion_trace.guid"), nullable=False
+        ForeignKey("emotion_trace.guid"), nullable=False, index=True
     )
     profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
     name: Mapped[str] = mapped_column(types.String, nullable=False)

@@ -19,7 +19,8 @@ class UserService:
     def create_user(self, email: str, password: str) -> UserModel | None:
         try:
             if self.get_user_by_email(email):
-                raise Exception("User already exists")
+                LOGGER.warning(f"User already exists {email}")
+                return None
             user = UserModel(
                 email=email,
                 hashed_password=sha256(password.encode()).hexdigest(),
@@ -38,8 +39,8 @@ class UserService:
         except Exception as e:
             LOGGER.error(f"Failed to create user: {e}")
             self._session.rollback()
-            return None
-
+            raise e
+        
     def fetch_user_api_key(self, email: str, password: str) -> UserModel | None:
         user = self.get_user_by_email(email)
         if user and user.hashed_password == sha256(password.encode()).hexdigest():

@@ -10,7 +10,7 @@ from app.config import Config
 from app.logger import LOGGER
 from data.models import UserModel
 from data.schemas import EmotionTraceCreationSchema, EmotionTraceSchema
-from services import UserService
+from services.user import UserService
 
 
 class EmotionService:
