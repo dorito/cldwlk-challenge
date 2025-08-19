@@ -1,10 +1,11 @@
 import time
 
+from pydantic import ValidationError
+from sqlalchemy.orm import Session
+
 from app.logger import LOGGER
 from data.models import EmotionTraceModel
 from data.schemas import EmotionTraceSchema
-from pydantic import ValidationError
-from sqlalchemy.orm import Session
 from tasks import process_emotional_message_task
 
 

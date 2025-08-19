@@ -1,9 +1,10 @@
 import datetime
 import uuid
 
-from data.models.base import BaseModel
 from sqlalchemy import text, types
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from data.models.base import BaseModel
 
 
 class EmotionTraceModel(BaseModel):

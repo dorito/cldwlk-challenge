@@ -48,4 +48,6 @@ def _save_emotional_message_into_db(msg):
     DbSession.commit()
     trace.processed = True
     DbSession.commit()
-    LOGGER.info("Trace with idempotency id {msg.idempotency_guid} succesfully processed")
+    LOGGER.info(
+        "Trace with idempotency id {msg.idempotency_guid} succesfully processed"
+    )

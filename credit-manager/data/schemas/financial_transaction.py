@@ -1,7 +1,7 @@
-from typing import Optional
 import datetime
 import decimal
 import uuid
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -18,8 +18,10 @@ class FinancialTransactionBaseSchema(BaseModel):
     due_at: datetime.datetime
     received_at: datetime.datetime
 
+
 class FinancialTransactionSchema(FinancialTransactionBaseSchema):
     guid: Optional[uuid.UUID] | None
+
 
 class FinancialTransactionCreationSchema(FinancialTransactionBaseSchema):
     idempotency_guid: uuid.UUID

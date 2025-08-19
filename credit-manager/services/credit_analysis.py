@@ -32,12 +32,16 @@ class CreditAnalysisService:
             chance_of_payment
         )
         return {
-            "credit_type": credit_type
-            if status != CreditRequestStatusEnum.REJECTED.value
-            else None,
-            "available_amount": available_amount
-            if status != CreditRequestStatusEnum.REJECTED.value
-            else None,
+            "credit_type": (
+                credit_type
+                if status != CreditRequestStatusEnum.REJECTED.value
+                else None
+            ),
+            "available_amount": (
+                available_amount
+                if status != CreditRequestStatusEnum.REJECTED.value
+                else None
+            ),
             "status": status,
             "interest_rate": interest_rate,
         }

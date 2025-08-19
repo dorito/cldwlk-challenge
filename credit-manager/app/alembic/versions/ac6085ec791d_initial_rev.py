@@ -1,10 +1,11 @@
 """initial rev
 
 Revision ID: ac6085ec791d
-Revises: 
+Revises:
 Create Date: 2025-08-18 15:38:59.026849
 
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa

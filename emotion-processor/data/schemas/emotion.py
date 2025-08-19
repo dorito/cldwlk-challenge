@@ -1,5 +1,6 @@
-from data.enums import EmotionEnum
 from pydantic import BaseModel
+
+from data.enums import EmotionEnum
 
 
 class EmotionSchema(BaseModel):

@@ -93,9 +93,21 @@ class CreditRequestService:
                 )
                 return
             credit_request.status = approved_values["status"].value
-            credit_request.interest_rate = approved_values["interest_rate"] if credit_request.status == CreditRequestStatusEnum.APPROVED.value else None
-            credit_request.available_amount = approved_values["available_amount"] if credit_request.status == CreditRequestStatusEnum.APPROVED.value else None
-            credit_request.available_credit_type = approved_values["credit_type"].value if credit_request.status == CreditRequestStatusEnum.APPROVED.value else None
+            credit_request.interest_rate = (
+                approved_values["interest_rate"]
+                if credit_request.status == CreditRequestStatusEnum.APPROVED.value
+                else None
+            )
+            credit_request.available_amount = (
+                approved_values["available_amount"]
+                if credit_request.status == CreditRequestStatusEnum.APPROVED.value
+                else None
+            )
+            credit_request.available_credit_type = (
+                approved_values["credit_type"].value
+                if credit_request.status == CreditRequestStatusEnum.APPROVED.value
+                else None
+            )
             self._session.commit()
             self._credit_request_updated_event(credit_request.guid)
         except Exception as e:

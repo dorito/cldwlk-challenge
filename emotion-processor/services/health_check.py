@@ -1,10 +1,11 @@
 from socket import AF_INET
 
+from kafka import BrokerConnection
+from sqlalchemy import text
+
 from app.config import Config
 from app.database import DbSession, init_db_session
 from app.logger import LOGGER
-from kafka import BrokerConnection
-from sqlalchemy import text
 from tasks import health_check_task as celery_health_check
 
 

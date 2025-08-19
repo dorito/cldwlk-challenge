@@ -9,6 +9,7 @@ from data.enums import (
     CreditRequestTypeEnum,
 )
 
+
 class CreditLoanSchema(BaseModel):
     guid: uuid.UUID
     profile_guid: uuid.UUID
@@ -21,6 +22,7 @@ class CreditLoanSchema(BaseModel):
     available_credit_type: CreditRequestTypeEnum | None
     interest_rate: decimal.Decimal | None
     webhook_url: str
+
 
 class CreditLoanCreationSchema(BaseModel):
     requested_amount: decimal.Decimal

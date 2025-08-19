@@ -1,6 +1,7 @@
+from kafka import KafkaConsumer
+
 from app.config import Config
 from app.logger import LOGGER
-from kafka import KafkaConsumer
 from services import EmotionService
 
 
