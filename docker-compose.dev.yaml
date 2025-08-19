@@ -1,5 +1,5 @@
 services:
-  # Local infra services (kafka, zookeeper, kafka-ui, postgresql, redis)
+  # Local infra services (kafka, zookeeper, postgresql, redis)
   kafka:
     image: bitnami/kafka:4.0.0-debian-12-r10
     restart: on-failure
@@ -24,21 +24,6 @@ services:
     image: bitnami/zookeeper:3.9.3-debian-12-r21
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-
-  kafka-ui:
-    image: provectuslabs/kafka-ui:v0.7.2
-    depends_on:
-      kafka:
-        condition: service_healthy
-      zookeeper:
-        condition: service_started
-    ports:
-      - "${KAFKA_UI_PORT:-8880}:8080"
-    restart: always
-    environment:
-      - KAFKA_CLUSTERS_0_NAME=kafka
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
-      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
 
   database:
     image: postgres:13.22-alpine3.22
@@ -82,8 +67,6 @@ services:
     depends_on:
       database:
         condition: service_started
-    ports:
-      - "${EMOTION_PROCESSOR_API_PORT:-8881}:80"
 
   credit-manager-api:
     restart: always
@@ -94,8 +77,6 @@ services:
     depends_on:
       database:
         condition: service_started
-    ports:
-      - "${CREDIT_MANAGER_API_PORT:-8882}:80"
 
 
   credit-manager-kafka-worker:
