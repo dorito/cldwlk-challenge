@@ -1,8 +1,9 @@
 import uuid
 
-from data.models.base import BaseModel
 from sqlalchemy import ForeignKey, text, types
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from data.models.base import BaseModel
 
 
 class EmotionModel(BaseModel):
@@ -11,10 +12,10 @@ class EmotionModel(BaseModel):
     guid: Mapped[uuid.UUID] = mapped_column(
         types.Uuid,
         primary_key=True,
-        server_default=text("gen_random_uuid()"),  # use what you have on your server
+        server_default=text("gen_random_uuid()"),
     )
     trace_guid: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("emotion_trace.guid"), nullable=False
+        ForeignKey("emotion_trace.guid"), nullable=False, index=True
     )
     profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
     name: Mapped[str] = mapped_column(types.String, nullable=False)

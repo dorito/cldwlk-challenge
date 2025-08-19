@@ -12,11 +12,11 @@ services:
       - --port 
       - "80"
     env_file:
-      - .env
+      - .env.dev
     volumes:
       - .:/code
     healthcheck:
       test: python health_check.py --service api|| exit 1
-      interval: 5s
-      timeout: 5s
+      interval: 180s
+      timeout: 30s
       retries: 5

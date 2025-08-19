@@ -1,9 +1,10 @@
 import datetime
 import uuid
 
-from data.models.base import BaseModel
 from sqlalchemy import text, types
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from data.models.base import BaseModel
 
 
 class EmotionTraceModel(BaseModel):
@@ -12,8 +13,8 @@ class EmotionTraceModel(BaseModel):
     guid: Mapped[uuid.UUID] = mapped_column(
         types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
-    idempotency_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
-    profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False)
+    idempotency_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False, index=True)
+    profile_guid: Mapped[uuid.UUID] = mapped_column(types.Uuid, nullable=False, index=True)
     received_at: Mapped[datetime.datetime] = mapped_column(
         types.DateTime, nullable=False
     )

@@ -1,8 +1,9 @@
+from celery import Celery
+from celery.signals import worker_init
+
 from app.config import Config
 from app.database import init_db_session
 from app.logger import LOGGER
-from celery import Celery
-from celery.signals import worker_init
 
 app = Celery("celery_app")
 app.conf.update(

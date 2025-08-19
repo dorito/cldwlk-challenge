@@ -1,8 +1,10 @@
 import enum
 
+
 class FinancialTransactionSourceEnum(enum.StrEnum):
     INTERNAL = "internal"
     EXTERNAL = "external"
+
 
 class FinancialTransactionReasonEnum(enum.StrEnum):
     DEBTS = "debts"

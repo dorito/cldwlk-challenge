@@ -27,7 +27,9 @@ class FinancialTransactionService:
 
     def async_process_message(self, message):
         try:
-            parsed_msg = FinancialTransactionCreationSchema.model_validate_json(message.value)
+            parsed_msg = FinancialTransactionCreationSchema.model_validate_json(
+                message.value
+            )
             self._async_process_message(parsed_msg.model_dump(mode="json"))
             LOGGER.debug(f"Processed message: {parsed_msg}")
         except ValidationError as e:
@@ -35,7 +37,7 @@ class FinancialTransactionService:
         except Exception as e:
             LOGGER.error(f"Error processing message {message.value}: {e}")
             raise e
-        
+
     def _async_process_message(self, message):
         from tasks import process_financial_transaction_task
 

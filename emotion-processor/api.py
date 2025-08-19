@@ -1,11 +1,12 @@
 import uuid
 from typing import Annotated, Union
 
+from fastapi import Depends, FastAPI, Query, Response, status
+from sqlalchemy.orm import Session
+
 from app.database import ENGINE
 from data.schemas import EmotionTraceGetDataQueryParamsSchema, EmotionTraceSchema
-from fastapi import Depends, FastAPI, Query, Response, status
 from services import EmotionService, HealthCheckService
-from sqlalchemy.orm import Session
 
 app = FastAPI()
 

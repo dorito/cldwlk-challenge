@@ -1,7 +1,6 @@
 from socket import AF_INET
 
 from kafka import BrokerConnection
-
 from sqlalchemy import text
 
 from app.config import Config
@@ -21,7 +20,7 @@ class HealthCheckService:
         except Exception as e:
             LOGGER.error(f"Database health check failed: {e}")
             return False
-        
+
     def _check_kafka_health(self) -> bool:
         try:
             kafka_host_data = Config.KAFKA_BOOTSTRAP_SERVERS.split(":")
