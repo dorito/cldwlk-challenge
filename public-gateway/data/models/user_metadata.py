@@ -12,7 +12,7 @@ class UserMetadataModel(BaseModel):
     guid: Mapped[uuid.UUID] = mapped_column(
         types.Uuid,
         primary_key=True,
-        server_default=text("gen_random_uuid()"),  # use what you have on your server
+        server_default=text("gen_random_uuid()"),
     )
     user_guid: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.guid"), nullable=False
