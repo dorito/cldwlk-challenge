@@ -18,6 +18,11 @@ After the command runs successfuly, you need to execute three more commands:
 - `docker exec cldwlk-test-emotion-processor-api alembic upgrade head`
 - `docker exec cldwlk-test-public-gateway-api alembic upgrade head`
 
+## How to use the project endpoints to validate the challenge solution
+- Create a new user with `/internal/tests/create-user` endpoint
+- Get the `api_key` value
+- Use it to send data to the endpoints that require auth
+
 ## Available API REST endpoints
 - `/internal/tests/create-user [POST]`
   - Description: creates user to validate the test locally
