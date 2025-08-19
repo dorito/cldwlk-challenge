@@ -269,7 +269,13 @@ curl --request GET \
 
 ## Planned upgrades for the future
 - Configuration to retry failed jobs in Celery
+- Add `trace_id` to improve traceability
 - Automated tests in critical points
+
+## Some privacy considerations
+All emotional and financial data isn't directly related to a user, but to a `profile_guid`.
+
+I've done this because I don't know for how long the data needs to be kept, but I know that with a decoupled identifier, we can easily anonymize data from users and minimize a lot of possibilities of accidental data leaks when using data from subsystems.
 
 ## Other relevant docs
 - [SQL scripts](./docs/SQL.md)
